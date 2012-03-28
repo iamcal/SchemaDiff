@@ -180,9 +180,9 @@ word-wrap:break-word;
 }
 
 tr td pre		{ border: 1px solid #F0F0F0; background-color: #F8F8F8; }
-tr.diff td pre		{ border: 1px solid #F0F0BC; background-color: #FFFFCC; background-image: url(images/bullet_yellow.png); }
-tr.newleft td.left pre	{ border: 1px solid #BB8888; background-color: #FFCCCC; background-image: url(images/bullet_delete.png); }
-tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; background-image: url(images/bullet_add.png); }
+tr.diff td pre		{ border: 1px solid #F0F0BC; background-color: #FFFFCC; background-image: url(bullet_yellow.png); }
+tr.newleft td.left pre	{ border: 1px solid #BB8888; background-color: #FFCCCC; background-image: url(bullet_delete.png); }
+tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; background-image: url(bullet_add.png); }
 
 .selnav {
 	background-color: #f5f5f5;

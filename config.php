@@ -13,8 +13,8 @@
 	#
 
 	$schemas['main'] = array(
-		'db_a'		=> array('dev-db1', 'speck_dev_main', 'user', null),
-		'db_b'		=> array('dbmain1', 'ts_main', 'root', 'PASSWORD'),
+		'db_a'		=> array('dev-db', 'my_db', 'user', null),
+		'db_b'		=> array('prod-db', 'my_db', 'root', 'PASSWORD'),
 		'label_a'	=> 'Dev DB',
 		'label_b'	=> 'Prod DB',
 		'label'		=> 'MySQL Dump',
@@ -26,10 +26,10 @@
 	#
 
 	$schemas['cmd'] = array(
-		'cmd_a'		=> "cat dev.dump",
-		'cmd_b'		=> "cat prod.dump",
-		'label_a'	=> 'Dev DB',
-		'label_b'	=> 'Prod DB',
+		'cmd_a'		=> "perl /woo/yay/hoopla.pl",
+		'cmd_b'		=> "php -q /foo/bar/baz.php",
+		'label_a'	=> 'Perl thingy',
+		'label_b'	=> 'PHP thingy',
 		'label'		=> 'Commands',
 	);
 
@@ -39,10 +39,10 @@
 	#
 
 	$schemas['files'] = array(
-		'file_a'	=> 'dev.dump',
-		'file_b'	=> 'prod.dump',
-		'label_a'	=> 'Dev DB',
-		'label_b'	=> 'Prod DB',
+		'file_a'	=> 'demo_dev.sql',
+		'file_b'	=> 'demo_prod.sql',
+		'label_a'	=> 'Dev DB Dump',
+		'label_b'	=> 'Prod DB Dump',
 		'label'		=> 'Files',
 	);
 

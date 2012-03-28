@@ -1,34 +1,114 @@
 <?
-	$dbs = array(
-		'main'		=> array('dev-db1:speck_dev_main',	'dbmain1:ts_main'),
-		'static'	=> array('dev-db1:speck_dev_static',	'dbmain1:ts_static'),
-		'world'		=> array('dev-db1:speck_world',		'dev-db1:speck_world_prod'),
-		'users-dev'	=> array('dev-db1:speck_dev_user1',	'dev-db1:speck_dev_user2'),
-		'users-prod1'	=> array('dev-db1:speck_dev_user1',	'dbmain1:ts_user1'),
-		'users-prod2'	=> array('dev-db1:speck_dev_user1',	'dbmain1:ts_user2'),
-		'publisher'	=> array('dev-db1:speck_publisher',	'dev-db1:speck_publisher'),
+	#
+	# config
+	#
+
+	$schemas = array();
+
+	# if you have a mysql database, define db_a/db_b with host, database-name, user and password
+	$schemas['main'] = array(
+		'db_a'		=> array('dev-db1', 'speck_dev_main', 'user', null),
+		'db_b'		=> array('dbmain1', 'ts_main', 'root', 'PASSWORD'),
+		'label_a'	=> 'Dev DB',
+		'label_b'	=> 'Prod DB',
+		'label'		=> 'MySQL Dump',
 	);
 
-	$default_key = 'main';
+	# for you have a command that will output the thing to diff, use cmd_a/cmd_b
+	$schemas['cmd'] = array(
+		'cmd_a'		=> "cat dev.dump",
+		'cmd_b'		=> "cat prod.dump",
+		'label_a'	=> 'Dev DB',
+		'label_b'	=> 'Prod DB',
+		'label'		=> 'Commands',
+	);
+
+	# if you have a file you need to compare, that's even easier
+	$schemas['files'] = array(
+		'file_a'	=> 'dev.dump',
+		'file_b'	=> 'prod.dump',
+		'label_a'	=> 'Dev DB',
+		'label_b'	=> 'Prod DB',
+		'label'		=> 'Files',
+	);
+
+
+
+	#
+	# what schema are we viewing?
+	#
+
+	$default_key = array_shift(array_keys($schemas));
 	$key = $default_key;
-	if (in_array($_GET[k], array_keys($dbs))) $key = $_GET[k];
-	$db = $dbs[$key];
+	if (in_array($_GET['k'], array_keys($schemas))) $key = $_GET['k'];
+	$schema = $schemas[$key];
 
 
-	$time = time();
-	$temp1 = "/tmp/schema1_$time";
-	$temp2 = "/tmp/schema2_$time";
+	#
+	# turn both sides into files
+	#
+
+	$junk_files = array();
+
+	$file_a = parse_file($schema, 'a');
+	$file_b = parse_file($schema, 'b');
+
+
+echo "$key : $file_a / $file_b";
+
+	function parse_file($schema, $suffix){
+
+		if ($schema["file_$suffix"]){
+			return $schema["file_$suffix"];
+		}
+
+		if ($schema["db_$suffix"]){
+			$db = $schema["db_$suffix"];
+
+			$dump = "mysqldump";
+			if (isset($db[0])) $dump .= " -h$db[0]";
+			if (isset($db[2])) $dump .= " -u$db[2]";
+			if (isset($db[3])) $dump .= " -p$db[3]";
+			$dump .= " $db[1] --no-data --no-create-db --compact";
+
+			$sed = "sed 's/ AUTO_INCREMENT=[0-9]\\+//'";
+
+			# just let thgis cascade down...
+			$schema["cmd_$suffix"] = "$dump | $sed";
+		}
+
+		if ($schema["cmd_$suffix"]){
+			$temp = tempnam(sys_get_temp_dir(), 'schemadiff');
+			$GLOBALS['junk_files'][] = $temp;
+			$cmd = $schema["cmd_$suffix"];
+			shell_exec("$cmd > $temp");
+			return $temp;
+		}
+
+
+		echo("don't know how to get content for this schema ($suffix):\n");
+		print_r($schema);
+		exit;
+	}
+
+
+	#
+	# perform diff
+	#
 
 	$max_line = 100;
 	$max2 = $max_line + $max_line + 2;
 
-	list($h1, $n1) = explode(':', $db[0]);
-	list($h2, $n2) = explode(':', $db[1]);
+	$lines = shell_exec("diff -y -W$max2 --expand-tabs $file_a $file_b");
 
-	#shell_exec("mysqldump -h$h1 -uroot $n1 --no-data --no-create-db --compact | sed 's/ AUTO_INCREMENT=[0-9]\+//' > $temp1");
-	#shell_exec("mysqldump -h$h2 -uroot $n2 --no-data --no-create-db --compact | sed 's/ AUTO_INCREMENT=[0-9]\+//' > $temp2");
-	$lines = shell_exec("diff -y -W$max2 --expand-tabs dev.dump prod.dump");
-	shell_exec("rm $temp1 $temp2");
+	foreach ($junk_files as $f){
+		unlink($f);
+	}
+
+
+	#
+	# parse diff
+	#
 
 	$lines = explode("\n", trim($lines));
 	$pairs = array();
@@ -116,15 +196,18 @@ tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; 
 <p class="selnav">
 <?
 	$bits = array();
-	foreach ($dbs as $k => $v){
+	foreach ($schemas as $k => $v){
+
+		$label = HtmlspecialChars($v['label']);
+		$kk = HtmlspecialChars($k);
 
 		if ($k == $key){
-			$bits[] = "<b>$k</b>";
+			$bits[] = "<b>$label</b>";
 		}else{
 			if ($k == $default_key){
-				$bits[] = "<a href=\"schema.php\">$k</a>";
+				$bits[] = "<a href=\"./\">$label</a>";
 			}else{
-				$bits[] = "<a href=\"schema.php?k=$k\">$k</a>";
+				$bits[] = "<a href=\"./?k=$kk\">$label</a>";
 			}
 		}
 	}
@@ -135,8 +218,8 @@ tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; 
 
 <table>
 	<tr>
-		<th>Dev (<?=$db[0]?>)</th>
-		<th>Prod (<?=$db[1]?>)</th>
+		<th><?=HtmlSpecialChars($schema['label_a'])?></th>
+		<th><?=HtmlSpecialChars($schema['label_b'])?></th>
 	</tr>
 <? foreach ($pairs as $pair){ ?>
 	<tr class="<?=get_line_class($pair[2])?>">

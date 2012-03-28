@@ -2,6 +2,8 @@
 
 This is a quick tool for comparing two database schemas, but can be used as a web-based diff tool for any two sources.
 
+<a href="https://github.com/iamcal/SchemaDiff/raw/master/demo_large.png"><img src="https://github.com/iamcal/SchemaDiff/raw/master/demo.png" /></a>
+
 ## Features
 
 * Visual diff with coloring

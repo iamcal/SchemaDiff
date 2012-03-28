@@ -89,6 +89,89 @@
 		}
 	}
 
+
+	#
+	# collapse same lines?
+	#
+
+	if ($max_context){
+
+		#
+		# split into groups by type first
+		#
+
+		$groups = array();
+		$last_grp = '?';
+		$last_pairs = array();
+
+		foreach ($pairs as $pair){
+			if ($last_grp != $pair[2]){
+				if (count($last_pairs)){
+					$groups[] = array(
+						'type' => $last_grp,
+						'pairs' => $last_pairs,
+					);
+					$last_pairs = array();
+				}
+				$last_grp = $pair[2];
+			}
+			$last_pairs[] = $pair;
+		}
+		$groups[] = array(
+			'type' => $last_grp,
+			'pairs' => $last_pairs,
+		);
+
+
+		$idx = 1;
+		$max = count($groups);
+
+		$pairs = array();
+		foreach ($groups as $group){
+
+			if ($group['type'] == ' '){
+
+				if ($idx == 1){
+					if (count($group['pairs']) <= $max_context+1){
+						foreach ($group['pairs'] as $pair) $pairs[] = $pair;
+					}else{
+						$pairs[] = array('...', '...', '+');
+						$snip = array_slice($group['pairs'], -$max_context, $max_context);
+						foreach ($snip as $pair) $pairs[] = $pair;
+					}
+				}elseif ($idx == $max){
+					if (count($group['pairs']) <= $max_context+1){
+						foreach ($group['pairs'] as $pair) $pairs[] = $pair;
+					}else{
+						$snip = array_slice($group['pairs'], 0, $max_context);
+						foreach ($snip as $pair) $pairs[] = $pair;
+						$pairs[] = array('...', '...', '+');
+					}
+				}else{
+					if (count($group['pairs']) <= $max_context+$max_context+1){
+						foreach ($group['pairs'] as $pair) $pairs[] = $pair;
+					}else{
+						$pre = array_slice($group['pairs'], 0, $max_context);
+						$post = array_slice($group['pairs'], -$max_context, $max_context);
+						foreach ($pre as $pair) $pairs[] = $pair;
+						$pairs[] = array('...', '...', '+');
+						foreach ($post as $pair) $pairs[] = $pair;
+					}
+				}
+
+			}else{
+				foreach ($group['pairs'] as $pair) $pairs[] = $pair;
+			}
+
+			$idx++;
+		}
+
+		#echo '<pre>';
+		#print_r($groups);
+		#exit;
+	}
+
+
 	function display($x){
 		if (strlen($x)){
 			$str = HtmlSpecialChars($x);
@@ -106,6 +189,7 @@
 		if ($x == '|') return 'diff';
 		if ($x == '<') return 'newleft';
 		if ($x == '>') return 'newright';
+		if ($x == '+') return 'collapse';
 		return 'fail';
 	}
 
@@ -148,6 +232,7 @@ tr td pre		{ border: 1px solid #F0F0F0; background-color: #F8F8F8; }
 tr.diff td pre		{ border: 1px solid #F0F0BC; background-color: #FFFFCC; background-image: url(bullet_yellow.png); }
 tr.newleft td.left pre	{ border: 1px solid #BB8888; background-color: #FFCCCC; background-image: url(bullet_delete.png); }
 tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; background-image: url(bullet_add.png); }
+tr.collapse td pre	{ border: 1px solid #BCBCF0; background-color: #CCCCFF; }
 
 .selnav {
 	background-color: #f5f5f5;

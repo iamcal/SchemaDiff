@@ -48,3 +48,9 @@
 
 
 
+	#
+	# if you only want to show *some* context around changes, set this to a value greater than zero.
+	# it will then collapse/hide undiffering blocks longer than this
+	#
+
+	$max_context = 0;

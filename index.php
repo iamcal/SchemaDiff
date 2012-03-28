@@ -46,7 +46,7 @@
 			$temp = tempnam(sys_get_temp_dir(), 'schemadiff');
 			$GLOBALS['junk_files'][] = $temp;
 			$cmd = $schema["cmd_$suffix"];
-			shell_exec("$cmd > $temp");
+			shell_exec("$cmd 1> $temp 2>&1");
 			return $temp;
 		}
 

@@ -1,38 +1,5 @@
 <?
-	#
-	# config
-	#
-
-	$schemas = array();
-
-	# if you have a mysql database, define db_a/db_b with host, database-name, user and password
-	$schemas['main'] = array(
-		'db_a'		=> array('dev-db1', 'speck_dev_main', 'user', null),
-		'db_b'		=> array('dbmain1', 'ts_main', 'root', 'PASSWORD'),
-		'label_a'	=> 'Dev DB',
-		'label_b'	=> 'Prod DB',
-		'label'		=> 'MySQL Dump',
-	);
-
-	# for you have a command that will output the thing to diff, use cmd_a/cmd_b
-	$schemas['cmd'] = array(
-		'cmd_a'		=> "cat dev.dump",
-		'cmd_b'		=> "cat prod.dump",
-		'label_a'	=> 'Dev DB',
-		'label_b'	=> 'Prod DB',
-		'label'		=> 'Commands',
-	);
-
-	# if you have a file you need to compare, that's even easier
-	$schemas['files'] = array(
-		'file_a'	=> 'dev.dump',
-		'file_b'	=> 'prod.dump',
-		'label_a'	=> 'Dev DB',
-		'label_b'	=> 'Prod DB',
-		'label'		=> 'Files',
-	);
-
-
+	include('config.php');
 
 	#
 	# what schema are we viewing?
@@ -53,8 +20,6 @@
 	$file_a = parse_file($schema, 'a');
 	$file_b = parse_file($schema, 'b');
 
-
-echo "$key : $file_a / $file_b";
 
 	function parse_file($schema, $suffix){
 
@@ -191,8 +156,11 @@ tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; 
 
 </style>
 
-<h1>DB Schema Comparison</h1>
+<h1>SchemaDiff Comparison Tool</h1>
 
+<?
+	if (count($schemas) > 1){
+?>
 <p class="selnav">
 <?
 	$bits = array();
@@ -215,6 +183,9 @@ tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; 
 	echo implode(' | ', $bits);
 ?>
 </p>
+<?
+	}
+?>
 
 <table>
 	<tr>

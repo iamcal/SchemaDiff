@@ -22,7 +22,7 @@
 
 
 	#
-	# for you have a command that will output the thing to diff, use cmd_a/cmd_b
+	# if you have a command that will output the thing to diff, use cmd_a/cmd_b
 	#
 
 	$schemas['cmd'] = array(

@@ -34,7 +34,7 @@
 			if (isset($db[0])) $dump .= " -h$db[0]";
 			if (isset($db[2])) $dump .= " -u$db[2]";
 			if (isset($db[3])) $dump .= " -p$db[3]";
-			$dump .= " $db[1] --no-data --no-create-db --compact";
+			$dump .= " $db[1] --no-data --no-create-db --compact 2>&1";
 
 			$sed = "sed 's/ AUTO_INCREMENT=[0-9]\\+//'";
 

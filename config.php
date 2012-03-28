@@ -53,4 +53,21 @@
 	# it will then collapse/hide undiffering blocks longer than this
 	#
 
-	$max_context = 0;
+	$max_context = 2;
+
+
+
+	#
+	# if there are certain strings that should be warned or alerted in your output, add them here
+	#
+
+	$warn_strings = array(
+		'character set',
+		'MyISAM',
+		'checksum',
+	);
+
+	$alert_strings = array(
+		'latin1',
+		'service',
+	);

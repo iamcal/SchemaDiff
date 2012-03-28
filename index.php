@@ -82,11 +82,19 @@
 		$b = trim(substr($line, $max_line+3));
 		$c = substr($line, $max_line, 1);
 
+		if ((has_warnings($a) || has_warnings($b)) && $c == ' ') $c = '!';
+
 		$pairs[] = array($a, $b, $c);
 
 		if (preg_match('!;$!', $a) || preg_match('!;$!', $b)){
 			$pairs[] = array('', '', $c);
 		}
+	}
+
+	function has_warnings($str){
+		foreach ($GLOBALS['warn_strings'] as $s) if (strpos($str, $s) !== false) return true;
+		foreach ($GLOBALS['alert_strings'] as $s) if (strpos($str, $s) !== false) return true;
+		return false;
 	}
 
 
@@ -172,12 +180,19 @@
 	}
 
 
+	# pre-escape these, since we'll be comparing them with escaped lines
+	foreach ($GLOBALS['warn_strings' ] as $k => $v) $GLOBALS['warn_strings' ][$k] = HtmlSpecialChars($v);
+	foreach ($GLOBALS['alert_strings'] as $k => $v) $GLOBALS['alert_strings'][$k] = HtmlSpecialChars($v);
+
 	function display($x){
 		if (strlen($x)){
 			$str = HtmlSpecialChars($x);
-			$str = str_replace('latin1', '<span style="background-color: red; color: white">latin1</span>', $str);
-			$str = str_replace('MyISAM', '<span style="background-color: orange; color: white">MyISAM</span>', $str);
-			$str = str_replace('character set', '<span style="background-color: orange; color: white">character set</span>', $str);
+			foreach ($GLOBALS['warn_strings'] as $s){
+				$str = str_replace($s, '<span style="background-color: orange; color: white">'.$s.'</span>', $str);
+			}
+			foreach ($GLOBALS['alert_strings'] as $s){
+				$str = str_replace($s, '<span style="background-color: red; color: white">'.$s.'</span>', $str);
+			}
 			return $str;
 		}
 		return '&nbsp;';

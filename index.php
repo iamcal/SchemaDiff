@@ -1,8 +1,4 @@
 <?
-	$current = 'deploy';
-	$subnav = 'schema';
-	include('head.txt');
-
 	$dbs = array(
 		'main'		=> array('dev-db1:speck_dev_main',	'dbmain1:ts_main'),
 		'static'	=> array('dev-db1:speck_dev_static',	'dbmain1:ts_static'),
@@ -29,9 +25,9 @@
 	list($h1, $n1) = explode(':', $db[0]);
 	list($h2, $n2) = explode(':', $db[1]);
 
-	shell_exec("mysqldump -h$h1 -uroot $n1 --no-data --no-create-db --compact | sed 's/ AUTO_INCREMENT=[0-9]\+//' > $temp1");
-	shell_exec("mysqldump -h$h2 -uroot $n2 --no-data --no-create-db --compact | sed 's/ AUTO_INCREMENT=[0-9]\+//' > $temp2");
-	$lines = shell_exec("diff -y -W$max2 --expand-tabs $temp1 $temp2");
+	#shell_exec("mysqldump -h$h1 -uroot $n1 --no-data --no-create-db --compact | sed 's/ AUTO_INCREMENT=[0-9]\+//' > $temp1");
+	#shell_exec("mysqldump -h$h2 -uroot $n2 --no-data --no-create-db --compact | sed 's/ AUTO_INCREMENT=[0-9]\+//' > $temp2");
+	$lines = shell_exec("diff -y -W$max2 --expand-tabs dev.dump prod.dump");
 	shell_exec("rm $temp1 $temp2");
 
 	$lines = explode("\n", trim($lines));
@@ -43,8 +39,8 @@
 
 		$pairs[] = array($a, $b, $c);
 
-		if (preg_match('!;$!', $a)){
-			$pairs[] = array('', '', '_');
+		if (preg_match('!;$!', $a) || preg_match('!;$!', $b)){
+			$pairs[] = array('', '', $c);
 		}
 	}
 
@@ -68,6 +64,7 @@
 		return 'fail';
 	}
 
+	include('head.txt');
 ?>
 <style>
 

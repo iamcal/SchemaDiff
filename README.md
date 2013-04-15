@@ -15,6 +15,6 @@ This is a quick tool for comparing two database schemas, but can be used as a we
 
 * Have a server running PHP with access to execute `diff`
 * Clone repo onto your server
-* Copy `config.php.example to `config.php` and modify it
+* Copy `config.php.example` to `config.php` and modify it
 * ...
 * Profit!

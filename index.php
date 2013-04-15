@@ -125,10 +125,27 @@
 			}
 			$last_pairs[] = $pair;
 		}
-		$groups[] = array(
-			'type' => $last_grp,
-			'pairs' => $last_pairs,
-		);
+		if ($last_grp == ' ' && !count($groups)){
+
+			# no groups - it's all matched
+
+			$groups[] = array(
+				'type' => '=',
+				'pairs' => array(
+					array(
+						"Content is equal",
+						"Content is equal",
+						"=",
+					),
+				),
+			);
+
+		}else{
+			$groups[] = array(
+				'type' => $last_grp,
+				'pairs' => $last_pairs,
+			);
+		}
 
 
 		$idx = 1;
@@ -176,6 +193,7 @@
 
 		#echo '<pre>';
 		#print_r($groups);
+		#echo '</pre>';
 		#exit;
 	}
 
@@ -201,6 +219,7 @@
 	function get_line_class($x){
 		if ($x == ' ') return 'ok';
 		if ($x == '_') return 'ok';
+		if ($x == '=') return 'match';
 		if ($x == '|') return 'diff';
 		if ($x == '<') return 'newleft';
 		if ($x == '>') return 'newright';
@@ -248,6 +267,7 @@ tr.diff td pre		{ border: 1px solid #F0F0BC; background-color: #FFFFCC; backgrou
 tr.newleft td.left pre	{ border: 1px solid #BB8888; background-color: #FFCCCC; background-image: url(bullet_delete.png); }
 tr.newright td.right pre{ border: 1px solid #CDF0CD; background-color: #DDFFDD; background-image: url(bullet_add.png); }
 tr.collapse td pre	{ border: 1px solid #BCBCF0; background-color: #CCCCFF; }
+tr.match td pre		{ border: 1px solid #CDF0CD; background-color: #DDFFDD; }
 
 .selnav {
 	background-color: #f5f5f5;

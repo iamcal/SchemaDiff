@@ -38,7 +38,7 @@
 
 			$sed = "sed 's/ AUTO_INCREMENT=[0-9]\\+//'";
 
-			# just let thgis cascade down...
+			# just let this cascade down...
 			$schema["cmd_$suffix"] = "$dump | $sed";
 		}
 

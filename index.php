@@ -240,6 +240,23 @@
 		return 'fail';
 	}
 
+	function build_url($args){
+
+		$use = $_GET;
+		foreach ($args as $k => $v){
+			if (is_null($v)){
+				unset($use[$k]);
+			}else{
+				$use[$k] = $v;
+			}
+		}
+
+		list($base) = explode('?', $_SERVER['REQUEST_URI']);
+
+		if (!count($use)) return $base;
+		return $base . '?' . http_build_query($use);
+	}
+
 	include('head.txt');
 ?>
 <style>
@@ -298,13 +315,10 @@ tr.match td pre		{ border: 1px solid #CDF0CD; background-color: #DDFFDD; }
 <div class="selnav">
 	<div style="float: right">
 <?
-	list($base) = explode('?', $_SERVER['REQUEST_URI']);
+	$link = build_url(array('show_all' => null, 'show_less' => null));
+	if ($max_context && $is_collapsed) $link = build_url(array('show_all' => 1, 'show_less' => null));
+	if (!$max_context && !$is_collapsed) $link = build_url(array('show_all' => null, 'show_less' => 1));
 
-	if ($max_context){
-		$link = $is_collapsed ? "{$base}?show_all=1" : $base;
-	}else{
-		$link = $is_collapsed ? $base : "{$base}?show_less=1";
-	}
 	$label = $is_collapsed ? "Show All" : "Show Diffs";
 
 	echo "<a href=\"{$link}\">{$label}</a>";
@@ -320,11 +334,9 @@ tr.match td pre		{ border: 1px solid #CDF0CD; background-color: #DDFFDD; }
 		if ($k == $key){
 			$bits[] = "<b>$label</b>";
 		}else{
-			if ($k == $default_key){
-				$bits[] = "<a href=\"./\">$label</a>";
-			}else{
-				$bits[] = "<a href=\"./?k=$kk\">$label</a>";
-			}
+			$link = build_url(array('k' => ($k == $default_key) ? null : $kk ));
+
+			$bits[] = "<a href=\"{$link}\">$label</a>";
 		}
 	}
 

@@ -99,10 +99,23 @@
 
 
 	#
-	# collapse same lines?
+	# collapse mode?
 	#
 
 	if ($max_context){
+		$use_context = $max_context;
+		$is_collapsed = !$_GET['show_all'];
+	}else{
+		$use_context = 5;
+		$is_collapsed = !!$_GET['show_less'];
+	}
+
+
+	#
+	# collapse same lines?
+	#
+
+	if ($is_collapsed){
 
 		#
 		# split into groups by type first
@@ -157,27 +170,27 @@
 			if ($group['type'] == ' '){
 
 				if ($idx == 1){
-					if (count($group['pairs']) <= $max_context+1){
+					if (count($group['pairs']) <= $use_context+1){
 						foreach ($group['pairs'] as $pair) $pairs[] = $pair;
 					}else{
 						$pairs[] = array('...', '...', '+');
-						$snip = array_slice($group['pairs'], -$max_context, $max_context);
+						$snip = array_slice($group['pairs'], -$use_context, $use_context);
 						foreach ($snip as $pair) $pairs[] = $pair;
 					}
 				}elseif ($idx == $max){
-					if (count($group['pairs']) <= $max_context+1){
+					if (count($group['pairs']) <= $use_context+1){
 						foreach ($group['pairs'] as $pair) $pairs[] = $pair;
 					}else{
-						$snip = array_slice($group['pairs'], 0, $max_context);
+						$snip = array_slice($group['pairs'], 0, $use_context);
 						foreach ($snip as $pair) $pairs[] = $pair;
 						$pairs[] = array('...', '...', '+');
 					}
 				}else{
-					if (count($group['pairs']) <= $max_context+$max_context+1){
+					if (count($group['pairs']) <= $use_context+$use_context+1){
 						foreach ($group['pairs'] as $pair) $pairs[] = $pair;
 					}else{
-						$pre = array_slice($group['pairs'], 0, $max_context);
-						$post = array_slice($group['pairs'], -$max_context, $max_context);
+						$pre = array_slice($group['pairs'], 0, $use_context);
+						$post = array_slice($group['pairs'], -$use_context, $use_context);
 						foreach ($pre as $pair) $pairs[] = $pair;
 						$pairs[] = array('...', '...', '+');
 						foreach ($post as $pair) $pairs[] = $pair;
@@ -272,6 +285,7 @@ tr.match td pre		{ border: 1px solid #CDF0CD; background-color: #DDFFDD; }
 .selnav {
 	background-color: #f5f5f5;
 	padding: 0.5em;
+	margin-bottom: 0.5em;
 }
 
 </style>
@@ -281,7 +295,21 @@ tr.match td pre		{ border: 1px solid #CDF0CD; background-color: #DDFFDD; }
 <?
 	if (count($schemas) > 1){
 ?>
-<p class="selnav">
+<div class="selnav">
+	<div style="float: right">
+<?
+	list($base) = explode('?', $_SERVER['REQUEST_URI']);
+
+	if ($max_context){
+		$link = $is_collapsed ? "{$base}?show_all=1" : $base;
+	}else{
+		$link = $is_collapsed ? $base : "{$base}?show_less=1";
+	}
+	$label = $is_collapsed ? "Show All" : "Show Diffs";
+
+	echo "<a href=\"{$link}\">{$label}</a>";
+?>
+	</div>
 <?
 	$bits = array();
 	foreach ($schemas as $k => $v){
@@ -302,7 +330,7 @@ tr.match td pre		{ border: 1px solid #CDF0CD; background-color: #DDFFDD; }
 
 	echo implode(' | ', $bits);
 ?>
-</p>
+</div>
 <?
 	}
 ?>
@@ -323,3 +351,4 @@ tr.match td pre		{ border: 1px solid #CDF0CD; background-color: #DDFFDD; }
 <?
 	include('foot.txt');
 ?>
+
